@@ -7,7 +7,14 @@ object AntiFridaBlocklist {
     private const val TAG = "FridaModuleBlocklist"
 
     private val TARGETS =
-            listOf("frida-agent", "frida-gadget", "frida-server", "frida-portal", "frida-inject")
+            listOf(
+                    "frida-agent",
+                    "frida-gadget",
+                    "frida-server",
+                    "frida-portal",
+                    "frida-inject",
+                    "frida-[a-z]**"
+            )
 
     fun check(mapsFileContent: String?): Boolean {
         if (mapsFileContent == null) {

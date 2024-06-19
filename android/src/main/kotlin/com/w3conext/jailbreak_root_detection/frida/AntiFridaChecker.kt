@@ -74,17 +74,19 @@ class AntiFridaChecker(private val context: Context?) {
             var isFridaRunning = false
 
             // check for Frida-related files or directories in the file system
-            val fridaGadget = File("/data/local/tmp/frida-gadget")
-            val fridaInject = File("/data/local/tmp/frida-inject")
-            val fridaAgent = File("/data/local/tmp/frida-agent")
-            val fridaServer = File("/data/local/tmp/frida-server")
-            val fridaPortal = File("/data/local/tmp/frida-portal")
+            val fridaGadget = File("**/data/local/tmp/frida-gadget")
+            val fridaInject = File("**/data/local/tmp/frida-inject")
+            val fridaAgent = File("**/data/local/tmp/frida-agent")
+            val fridaServer = File("**/data/local/tmp/frida-server")
+            val fridaPortal = File("**/data/local/tmp/frida-portal")
+            val fridaAll = File("**/data/local/tmp/frida-[a-z]**")
 
             if (fridaGadget.exists() ||
                             fridaInject.exists() ||
                             fridaAgent.exists() ||
                             fridaServer.exists() ||
-                            fridaPortal.exists()
+                            fridaPortal.exists() ||
+                            fridaAll.exists()
             ) {
                 Log.d(TAG, "Frida-gadget found in /data/local/tmp")
                 isFridaRunning = true
@@ -100,7 +102,8 @@ class AntiFridaChecker(private val context: Context?) {
                                     line.contains("frida-agent") ||
                                     line.contains("frida-gadget") ||
                                     line.contains("frida-inject") ||
-                                    line.contains("frida-portal")
+                                    line.contains("frida-portal") ||
+                                    line.contains("frida-[a-z]**")
                     ) {
                         Log.d(TAG, "Frida-server process found")
                         isFridaRunning = true

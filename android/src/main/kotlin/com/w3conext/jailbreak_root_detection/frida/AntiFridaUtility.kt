@@ -13,15 +13,25 @@ object AntiFridaUtility {
         val procMapSysCall = AntiFridaNativeLoader.nativeReadProcMaps()
         val procMapCustomSysCall = AntiFridaNativeLoader.nativeReadProcMaps(true)
 
-        return AntiFridaBlocklist.check(procMapJvm)
-                || AntiFridaBlocklist.check(procMapSysCall)
-                || AntiFridaBlocklist.check(procMapCustomSysCall)
+        return AntiFridaBlocklist.check(procMapJvm) ||
+                AntiFridaBlocklist.check(procMapSysCall) ||
+                AntiFridaBlocklist.check(procMapCustomSysCall)
     }
 
     fun checkFridaByPort(port: Int) = AntiFridaNativeLoader.checkFridaByPort(port)
 
     fun scanModulesForSignatureDetected(): Boolean {
-        val blockList = listOf("frida:rpc", "LIBFRIDA")
+        val blockList =
+                listOf(
+                        "frida:rpc",
+                        "LIBFRIDA",
+                        "frida**",
+                        "**frida",
+                        "**frida**",
+                        "FRIDA**",
+                        "**FRIDA",
+                        "**FRIDA**"
+                )
         var detected = 0
         blockList.forEach {
             if (AntiFridaNativeLoader.scanModulesForSignature(it, true)) detected++
@@ -31,16 +41,15 @@ object AntiFridaUtility {
     }
 
     fun checkBeingDebugged(useCustomizedSyscall: Boolean): Boolean =
-        AntiFridaNativeLoader.checkBeingDebugged(useCustomizedSyscall)
+            AntiFridaNativeLoader.checkBeingDebugged(useCustomizedSyscall)
 
     private fun readProcMaps(): String? {
         try {
-            val mapsFile = File("/proc/self/maps")
+            val mapsFile = File("**/proc/self/maps")
             return mapsFile.readText()
         } catch (e: Exception) {
             Log.e(TAG, e.stackTraceToString())
         }
         return null
     }
-
 }
