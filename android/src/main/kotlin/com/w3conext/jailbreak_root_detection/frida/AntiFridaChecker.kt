@@ -7,16 +7,14 @@ import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
 
-class AntiFridaChecker(
-    private val context: Context?
-) {
+class AntiFridaChecker(private val context: Context?) {
 
     fun isDetected(): Boolean {
-        return tryRoot()
-                || checkModuleDetected()
-                || checkPortDetected()
-                || checkServerProcessDetected()
-                || checkSignatureDetected()
+        return tryRoot() ||
+                checkModuleDetected() ||
+                checkPortDetected() ||
+                checkServerProcessDetected() ||
+                checkSignatureDetected()
     }
 
     fun tryRoot(): Boolean {
@@ -40,7 +38,8 @@ class AntiFridaChecker(
 
     // frida default port 27042
     fun checkPortDetected(): Boolean {
-        val detected = AntiFridaUtility.checkFridaByPort(27042)
+        val detected =
+                AntiFridaUtility.checkFridaByPort(27042) || AntiFridaUtility.checkFridaByPort(27047)
 
         Log.i(TAG, "Check port detected: $detected")
 
@@ -49,7 +48,11 @@ class AntiFridaChecker(
 
     fun checkServerProcessDetected(): Boolean {
         val result = SuperUserUtility.execRootCmd("ps -ef")
-        val detected = result.contains("frida-server")
+        val detected =
+                result.contains("frida-server") ||
+                        result.contains("frida-agent") ||
+                        result.contains("frida-gadget") ||
+                        result.contains("frida-inject")
 
         Log.i(TAG, "Check frida-server process detected: $detected")
 
@@ -67,13 +70,22 @@ class AntiFridaChecker(
     companion object {
         private const val TAG = "AntiFridaChecker"
 
-
         fun checkFrida(): Boolean {
             var isFridaRunning = false
 
             // check for Frida-related files or directories in the file system
             val fridaGadget = File("/data/local/tmp/frida-gadget")
-            if (fridaGadget.exists()) {
+            val fridaInject = File("/data/local/tmp/frida-inject")
+            val fridaAgent = File("/data/local/tmp/frida-agent")
+            val fridaServer = File("/data/local/tmp/frida-server")
+            val fridaPortal = File("/data/local/tmp/frida-portal")
+
+            if (fridaGadget.exists() ||
+                            fridaInject.exists() ||
+                            fridaAgent.exists() ||
+                            fridaServer.exists() ||
+                            fridaPortal.exists()
+            ) {
                 Log.d(TAG, "Frida-gadget found in /data/local/tmp")
                 isFridaRunning = true
             }
@@ -84,7 +96,12 @@ class AntiFridaChecker(
                 val bufferedReader = BufferedReader(InputStreamReader(process.inputStream))
                 var line: String? = bufferedReader.readLine()
                 while (line != null) {
-                    if (line.contains("frida-server")) {
+                    if (line.contains("frida-server") ||
+                                    line.contains("frida-agent") ||
+                                    line.contains("frida-gadget") ||
+                                    line.contains("frida-inject") ||
+                                    line.contains("frida-portal")
+                    ) {
                         Log.d(TAG, "Frida-server process found")
                         isFridaRunning = true
                         break

@@ -12,8 +12,13 @@ class FridaChecker {
     
     static func isFound() -> Bool {
         let fridaServerFile = FileManager.default.fileExists(atPath: "/usr/bin/frida-server")
+        let fridaAgentFile = FileManager.default.fileExists(atPath: "/usr/bin/frida-agent")
+        let fridaGadgetFile = FileManager.default.fileExists(atPath: "/usr/bin/frida-gadget")
+        let fridaInjectFile = FileManager.default.fileExists(atPath: "/usr/bin/frida-inject")
+        let fridaPortalFile = FileManager.default.fileExists(atPath: "/usr/bin/frida-portal")
+
         let fridaLibraryFile = FileManager.default.fileExists(atPath: "/usr/lib/libfrida-core.dylib")
-        if fridaServerFile || fridaLibraryFile {
+        if fridaServerFile || fridaAgentFile || fridaGadgetFile || fridaInjectFile || fridaPortalFile || fridaLibraryFile {
             return true
         }
         return false
